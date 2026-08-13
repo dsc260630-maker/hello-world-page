@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameBox — 웹 게임 모음</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 헤더: 로고 + 업로드 버튼 -->
+  <header class="header">
+    <div class="container">
+      <a href="#" class="logo">
+        <svg class="icon" viewBox="0 0 24 24">
+          <line x1="6" y1="12" x2="10" y2="12"/>
+          <line x1="8" y1="10" x2="8" y2="14"/>
+          <circle cx="16" cy="11" r="1"/>
+          <circle cx="18.5" cy="13.5" r="1"/>
+          <path d="M7 6h10a5 5 0 0 1 5 5v3a4 4 0 0 1-4 4c-1 0-1.6-.4-2.3-1.1L14 15.3a3 3 0 0 0-2-.8h0a3 3 0 0 0-2 .8l-1.7 1.6C7.6 17.6 7 18 6 18a4 4 0 0 1-4-4v-3a5 5 0 0 1 5-5z"/>
+        </svg>
+        GameBox
+      </a>
+
+      <div class="header-actions">
+        <div id="authArea"></div>
+        <button class="btn btn-upload" id="openUploadBtn">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 19V5"/>
+            <path d="M5 12l7-7 7 7"/>
+          </svg>
+          <span>업로드</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- 검색/카테고리 필터/정렬 바 (app.js에서 렌더링) -->
+    <div id="filterBarPlaceholder"></div>
+
+    <h2 class="section-title">모든 게임</h2>
+
+    <!-- 게임 카드 그리드 (app.js에서 렌더링) -->
+    <div id="gameGrid"></div>
+  </main>
+
+  <!-- 재생 모달: 카드 클릭 시 iframe으로 게임 표시 -->
+  <div id="playModal"></div>
+
+  <!-- 업로드 모달: 헤더 버튼 클릭 시 폼 표시 (PART 2 전까지는 로컬 더미 등록) -->
+  <div id="uploadModal"></div>
+
+  <!-- 로그인/회원가입 모달 -->
+  <div id="authModal"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

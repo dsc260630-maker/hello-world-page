@@ -1,0 +1,454 @@
+/* ============================================
+   디자인 시스템 (변경 금지: 색/버튼/폰트/아이콘 토큰)
+   ============================================ */
+
+/* 색 조합: 노션 · 모노톤 */
+:root{
+  --primary:#2383E2;
+  --text:#191919;
+  --sub:#787774;
+  --bg:#FFFFFF;
+  --surface:#F7F6F3;
+  --border:#E9E9E7;
+}
+
+/* 폰트: Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
+body{font-family:'Inter',sans-serif;letter-spacing:-0.01em}
+h1,h2,h3{font-weight:800}
+
+/* 버튼 모양: 둥근 알약 */
+.btn{border-radius:999px;padding:12px 22px;font-weight:700;background:var(--primary);color:#fff;border:none;cursor:pointer;transition:.15s}
+.btn:hover{filter:brightness(.95)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+
+/* 아이콘: 라인 (외곽선) */
+.icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ============================================
+   전역 리셋 / 베이스
+   ============================================ */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text)}
+body{font-size:15px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;font-size:inherit}
+img{max-width:100%;display:block}
+
+.container{
+  max-width:1120px;
+  margin:0 auto;
+  padding:0 24px;
+}
+
+/* 버튼 보조 변형 (아웃라인) — 필터/보조 액션용 */
+.btn-ghost{
+  border-radius:999px;
+  padding:10px 18px;
+  font-weight:500;
+  background:var(--bg);
+  color:var(--text);
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:.15s;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.btn-ghost:hover{background:var(--surface)}
+
+/* 아이콘 버튼 (닫기 등) */
+.icon-btn{
+  width:36px;height:36px;
+  display:inline-flex;align-items:center;justify-content:center;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--bg);
+  cursor:pointer;
+  color:var(--sub);
+  transition:.15s;
+}
+.icon-btn:hover{background:var(--surface);color:var(--text)}
+
+/* ============================================
+   헤더 / 네비게이션
+   ============================================ */
+.header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+}
+.header .container{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:68px;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:20px;
+  font-weight:800;
+  color:var(--text);
+}
+.logo .icon{color:var(--primary)}
+
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+#authArea{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.user-email{
+  font-size:13px;
+  color:var(--sub);
+  max-width:160px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.admin-badge{
+  font-size:10px;
+  font-weight:700;
+  color:var(--primary);
+  background:rgba(35,131,226,.1);
+  border-radius:999px;
+  padding:2px 8px;
+  white-space:nowrap;
+}
+
+/* 업로드 버튼 (알약, 아이콘+텍스트) */
+.btn-upload{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.btn-upload .icon{width:18px;height:18px;stroke-width:2}
+
+/* ============================================
+   메인 레이아웃 / 섹션 공통
+   ============================================ */
+main{padding:32px 0 80px}
+
+.section-title{
+  font-size:22px;
+  margin-bottom:16px;
+}
+.sub-text{color:var(--sub);font-size:14px}
+
+/* ============================================
+   필터바 (검색 + 카테고리 + 정렬)
+   ============================================ */
+.filter-bar{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:12px;
+  padding:16px 0 24px;
+}
+
+.search-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:1 1 240px;
+  min-width:200px;
+  padding:10px 16px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--surface);
+}
+.search-box .icon{width:18px;height:18px;color:var(--sub);flex-shrink:0}
+.search-box input{
+  border:none;
+  background:transparent;
+  outline:none;
+  width:100%;
+  font-family:inherit;
+  font-size:14px;
+  color:var(--text);
+}
+.search-box input::placeholder{color:var(--sub)}
+
+.filter-pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.pill{
+  border-radius:999px;
+  padding:8px 16px;
+  font-size:13px;
+  font-weight:500;
+  background:var(--bg);
+  color:var(--sub);
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:.15s;
+}
+.pill:hover{background:var(--surface);color:var(--text)}
+.pill.active{
+  background:var(--primary);
+  border-color:var(--primary);
+  color:#fff;
+  font-weight:700;
+}
+
+.sort-select{
+  padding:10px 14px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--bg);
+  color:var(--text);
+  font-family:inherit;
+  font-size:13px;
+  cursor:pointer;
+  outline:none;
+}
+
+/* ============================================
+   게임 카드 그리드
+   ============================================ */
+.game-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+  gap:20px;
+}
+
+.game-card{
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  cursor:pointer;
+  background:var(--bg);
+  transition:.15s;
+}
+.game-card:hover{
+  border-color:var(--primary);
+  box-shadow:0 4px 16px rgba(25,25,25,.06);
+  transform:translateY(-2px);
+}
+.game-card:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+
+.card-thumb{
+  aspect-ratio:4/3;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+.card-thumb .icon{width:40px;height:40px;color:var(--sub);stroke-width:1.25}
+
+.card-body{padding:14px 16px}
+
+.tag{
+  display:inline-block;
+  font-size:11px;
+  font-weight:700;
+  color:var(--sub);
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:3px 10px;
+  margin-bottom:8px;
+}
+
+.card-title{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.card-meta{color:var(--sub);font-size:12px}
+
+.empty-state{
+  color:var(--sub);
+  text-align:center;
+  padding:60px 0;
+  font-size:14px;
+}
+
+/* ============================================
+   모달 공통 (재생 / 업로드)
+   ============================================ */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(25,25,25,.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:200;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .15s;
+}
+.modal-overlay.is-open{opacity:1;pointer-events:auto}
+
+.modal-box{
+  background:var(--bg);
+  border-radius:20px;
+  width:100%;
+  max-width:720px;
+  max-height:90vh;
+  overflow:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
+  transform:translateY(8px);
+  transition:transform .15s;
+}
+.modal-overlay.is-open .modal-box{transform:translateY(0)}
+
+.modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px 24px;
+  border-bottom:1px solid var(--border);
+}
+.modal-header h3{font-size:17px}
+
+.modal-body{padding:24px}
+
+/* 로그인/회원가입 모달 */
+.modal-auth{max-width:400px}
+
+.auth-tabs{
+  display:flex;
+  gap:4px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:4px;
+  margin-bottom:20px;
+}
+.auth-tab{
+  flex:1;
+  padding:8px 0;
+  border:none;
+  border-radius:999px;
+  background:transparent;
+  color:var(--sub);
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+  transition:.15s;
+}
+.auth-tab.active{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+.auth-error{
+  color:#E03E3E;
+  font-size:13px;
+  margin:-6px 0 12px;
+  min-height:16px;
+}
+
+/* 재생 모달 iframe */
+.play-frame{
+  width:100%;
+  aspect-ratio:16/9;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--surface);
+}
+
+/* ============================================
+   업로드 폼
+   ============================================ */
+.field{margin-bottom:18px}
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:6px;
+  color:var(--text);
+}
+.field input[type="text"],
+.field select{
+  width:100%;
+  padding:11px 14px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-family:inherit;
+  font-size:14px;
+  color:var(--text);
+  background:var(--bg);
+  outline:none;
+  transition:.15s;
+}
+.field input[type="text"]:focus,
+.field select:focus{border-color:var(--primary)}
+
+.file-drop{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:28px 16px;
+  border:1.5px dashed var(--border);
+  border-radius:12px;
+  color:var(--sub);
+  font-size:13px;
+  text-align:center;
+  cursor:pointer;
+  transition:.15s;
+}
+.file-drop:hover,
+.file-drop.dragover{border-color:var(--primary);background:var(--surface);color:var(--text)}
+.file-drop .icon{width:26px;height:26px}
+
+.btn-block{width:100%;text-align:center}
+
+.upload-note{margin-top:10px;text-align:center;font-size:12px}
+
+/* --- 토스트 알림 --- */
+.toast{
+  position:fixed;
+  bottom:28px;
+  left:50%;
+  transform:translate(-50%, 12px);
+  background:var(--text);
+  color:#fff;
+  padding:12px 22px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:700;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);
+  opacity:0;
+  pointer-events:none;
+  transition:.2s;
+  z-index:300;
+}
+.toast.show{opacity:1;transform:translate(-50%, 0)}
+
+/* ============================================
+   반응형
+   ============================================ */
+@media (max-width:640px){
+  .container{padding:0 16px}
+  .header .container{height:60px}
+  .logo{font-size:18px}
+  .btn-upload span{display:none} /* 모바일에서는 아이콘만 */
+  .btn-upload{padding:10px}
+  .game-grid{grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:12px}
+  .sort-select{flex:1 1 100%}
+  .modal-header{padding:16px}
+  .modal-body{padding:16px}
+}
