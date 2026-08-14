@@ -8,6 +8,42 @@ const state = {
   sort: 'latest', // 'latest' | 'popular'
 };
 
+// 로그인한 사용자의 게임별 최고 점수 (game_id -> score)
+let myScores = {};
+
+// --- 내 최고 점수 목록 불러오기 (로그인 상태 바뀔 때 auth.js에서 호출) ---
+async function loadMyScores() {
+  if (!currentUser) {
+    myScores = {};
+    renderGrid();
+    return;
+  }
+  const { data, error } = await sb.from('high_scores').select('game_id, score');
+  if (error) {
+    console.error('점수 기록을 불러오지 못했습니다:', error.message);
+    return;
+  }
+  myScores = {};
+  for (const row of data) myScores[row.game_id] = row.score;
+  renderGrid();
+}
+
+// --- 최고 점수 갱신 시도 (더 높을 때만 서버에 반영) ---
+async function submitScore(gameId, score) {
+  if (!currentUser) return;
+  const prev = myScores[gameId] || 0;
+  if (score <= prev) return;
+
+  const { error } = await sb.rpc('submit_score', { game_id: gameId, score });
+  if (error) {
+    console.error('점수 기록 실패:', error.message);
+    return;
+  }
+  myScores[gameId] = score;
+  showToast(`최고 점수 갱신: ${score.toLocaleString()}`);
+  renderGrid();
+}
+
 // --- 필터바 렌더 ---
 function renderFilterBar() {
   const el = document.getElementById('filterBarPlaceholder');
@@ -111,6 +147,7 @@ function renderGrid() {
             <span class="tag">${g.category}</span>
             <h3 class="card-title">${g.title}</h3>
             <p class="card-meta">by ${g.profiles?.display_name ?? '익명'} · 플레이 ${g.plays.toLocaleString()}회</p>
+            ${myScores[g.id] ? `<p class="card-meta">내 최고 점수: ${myScores[g.id].toLocaleString()}</p>` : ''}
           </div>
         </article>
       `).join('')}
@@ -170,6 +207,9 @@ function getGamePublicUrl(filePath) {
   return data.publicUrl;
 }
 
+// 현재 재생 모달이 열려있는 동안의 점수 메시지 리스너 (닫을 때 반드시 해제)
+let currentScoreHandler = null;
+
 async function openPlayModal(game) {
   document.getElementById('playModalTitle').textContent = game.title;
 
@@ -178,6 +218,18 @@ async function openPlayModal(game) {
 
   document.getElementById('playModal').classList.add('is-open');
   document.body.style.overflow = 'hidden';
+
+  // 게임이 postMessage({ type: 'gamebox:score', score }) 로 점수를 보내오면 최고 점수 갱신 시도.
+  // event.source로 지금 열려있는 게임 iframe이 보낸 메시지인지 확인해서 다른 메시지는 무시.
+  if (currentScoreHandler) window.removeEventListener('message', currentScoreHandler);
+  currentScoreHandler = (event) => {
+    if (event.source !== frame.contentWindow) return;
+    if (!event.data || event.data.type !== 'gamebox:score') return;
+    const score = Math.floor(Number(event.data.score));
+    if (!Number.isFinite(score) || score < 0) return;
+    submitScore(game.id, score);
+  };
+  window.addEventListener('message', currentScoreHandler);
 
   // Supabase Storage가 공개 버킷의 HTML을 text/plain으로 강제 서빙하기 때문에
   // <iframe src="..."> 로는 실행이 안 됨 → fetch로 원문을 받아 srcdoc에 주입해서 실행시킨다.
@@ -202,6 +254,10 @@ function closePlayModal() {
   document.getElementById('playModal').classList.remove('is-open');
   document.getElementById('playFrame').srcdoc = '';
   document.body.style.overflow = '';
+  if (currentScoreHandler) {
+    window.removeEventListener('message', currentScoreHandler);
+    currentScoreHandler = null;
+  }
 }
 
 // ============================================

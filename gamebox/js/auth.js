@@ -140,6 +140,7 @@ sb.auth.onAuthStateChange(async (_event, session) => {
   }
 
   renderAuthArea();
+  loadMyScores();
 });
 
 initAuthModal();
