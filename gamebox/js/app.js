@@ -11,6 +11,46 @@ const state = {
 // 로그인한 사용자의 게임별 최고 점수 (game_id -> score)
 let myScores = {};
 
+// --- 게임 카드 썸네일 아이콘 ---
+// 제목이 일치하는 게임은 전용 아이콘을, 그 외에는 카테고리 기본 아이콘을 보여준다.
+// (기존 디자인 시스템의 라인 아이콘 스타일(.icon)을 그대로 따름 — 색/두께는 CSS 토큰이 담당)
+const GAME_ICONS = {
+  '벽돌깨기': '<rect x="3" y="4" width="6" height="3"/><rect x="10" y="4" width="6" height="3"/><rect x="17" y="4" width="4" height="3"/><rect x="5" y="9" width="6" height="3"/><rect x="12" y="9" width="6" height="3"/><circle cx="12" cy="18" r="2"/>',
+  '업 다운 숫자 맞추기 !': '<path d="M12 3v7"/><path d="M8 7l4-4 4 4"/><path d="M12 21v-7"/><path d="M8 17l4 4 4-4"/>',
+  '두더지 잡기': '<ellipse cx="12" cy="19" rx="8" ry="2"/><path d="M8 19c0-5 2-9 4-9s4 4 4 9"/><circle cx="10" cy="13" r="1"/><circle cx="14" cy="13" r="1"/>',
+  '점프 러너': '<path d="M3 19q9-16 18 0"/><rect x="9" y="15" width="4" height="4"/>',
+  '2048 미니': '<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>',
+  '카드 짝맞추기': '<rect x="3" y="5" width="10" height="14" rx="2"/><rect x="11" y="5" width="10" height="14" rx="2"/>',
+  '클릭 스피드 챌린지': '<circle cx="12" cy="12" r="4"/><path d="M12 2v3"/><path d="M12 19v3"/><path d="M2 12h3"/><path d="M19 12h3"/>',
+  '색깔 기억하기': '<circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/>',
+  '풍선 터뜨리기': '<ellipse cx="12" cy="9" rx="6" ry="7"/><path d="M12 16l-1.5 3h3z"/><path d="M12 19v3"/>',
+  '틱택토 vs AI': '<path d="M9 3v18"/><path d="M15 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M10.5 10.5l3 3"/><path d="M13.5 10.5l-3 3"/>',
+  '컬러 채우기': '<path d="M12 3c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z"/>',
+  '미니 오목': '<path d="M3 8h18"/><path d="M3 14h18"/><path d="M8 3v18"/><path d="M14 3v18"/><circle cx="8" cy="8" r="1.6"/><circle cx="14" cy="14" r="1.6"/>',
+  '3차선 카레이싱': '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 4v6"/><path d="M6.5 15.5l4-2.5"/><path d="M17.5 15.5l-4-2.5"/>',
+  '커브 도로 레이싱': '<path d="M8 21C8 15 4 13 4 9S8 3 8 3"/><path d="M16 21c0-6-4-8-4-12s4-6 4-6"/>',
+  '코인 레이싱': '<circle cx="12" cy="12" r="8"/><path d="M12 8v8"/><path d="M9.5 10a2.5 2.5 0 0 1 2.5-2c1.4 0 2.5.9 2.5 2s-1.1 2-2.5 2-2.5.9-2.5 2 1.1 2 2.5 2 2.5-.9 2.5-2"/>',
+  '스페이스 슈터': '<path d="M12 2c3 3 4 7 4 11l-4 3-4-3c0-4 1-8 4-11z"/><path d="M9 15l-3 4h3z"/><path d="M15 15l3 4h-3z"/><circle cx="12" cy="9" r="1.4"/>',
+  '갤럭시 슈팅': '<ellipse cx="12" cy="12" rx="9" ry="3"/><path d="M8 12c0-3 2-6 4-6s4 3 4 6"/><circle cx="12" cy="9" r="1"/>',
+  '타겟 슈팅': '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3"/><path d="M12 19v3"/><path d="M2 12h3"/><path d="M19 12h3"/>',
+};
+
+// 아이콘이 등록되지 않은 게임(새로 업로드된 게임 등)을 위한 카테고리별 기본 아이콘
+const CATEGORY_ICONS = {
+  '액션': '<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>',
+  '퍼즐': '<path d="M6 3h6v3a2 2 0 1 0 0 4v0-4H3v6h3a2 2 0 1 1 0 4H3v5h6a2 2 0 1 1 4 0h6v-6a2 2 0 1 1 0-4v-6h-6a2 2 0 1 1-4 0V3z"/>',
+  '캐주얼': '<path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 20 12 16.5 6.5 20 8 13.5 3 9l6.5-.5z"/>',
+  '전략': '<path d="M9 3h6v3H9z"/><path d="M8 6h8l-1 5H9z"/><path d="M12 11v6"/><path d="M8 21h8"/><path d="M9 21c0-2 1.5-3 3-3s3 1 3 3"/>',
+  '레이싱': '<path d="M4 4v16"/><path d="M4 5h6l2 2h8v6h-8l-2-2H4"/>',
+  '슈팅': '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3"/><path d="M12 19v3"/><path d="M2 12h3"/><path d="M19 12h3"/>',
+};
+
+const DEFAULT_ICON = '<line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="16" cy="11" r="1"/><circle cx="18.5" cy="13.5" r="1"/><path d="M7 6h10a5 5 0 0 1 5 5v3a4 4 0 0 1-4 4c-1 0-1.6-.4-2.3-1.1L14 15.3a3 3 0 0 0-2-.8h0a3 3 0 0 0-2 .8l-1.7 1.6C7.6 17.6 7 18 6 18a4 4 0 0 1-4-4v-3a5 5 0 0 1 5-5z"/>';
+
+function getGameThumbIcon(game) {
+  return GAME_ICONS[game.title] || CATEGORY_ICONS[game.category] || DEFAULT_ICON;
+}
+
 // --- 내 최고 점수 목록 불러오기 (로그인 상태 바뀔 때 auth.js에서 호출) ---
 async function loadMyScores() {
   if (!currentUser) {
@@ -135,13 +175,7 @@ function renderGrid() {
       ${games.map(g => `
         <article class="game-card" data-id="${g.id}" tabindex="0">
           <div class="card-thumb">
-            <svg class="icon" viewBox="0 0 24 24">
-              <line x1="6" y1="12" x2="10" y2="12"/>
-              <line x1="8" y1="10" x2="8" y2="14"/>
-              <circle cx="16" cy="11" r="1"/>
-              <circle cx="18.5" cy="13.5" r="1"/>
-              <path d="M7 6h10a5 5 0 0 1 5 5v3a4 4 0 0 1-4 4c-1 0-1.6-.4-2.3-1.1L14 15.3a3 3 0 0 0-2-.8h0a3 3 0 0 0-2 .8l-1.7 1.6C7.6 17.6 7 18 6 18a4 4 0 0 1-4-4v-3a5 5 0 0 1 5-5z"/>
-            </svg>
+            <svg class="icon" viewBox="0 0 24 24">${getGameThumbIcon(g)}</svg>
           </div>
           <div class="card-body">
             <span class="tag">${g.category}</span>
