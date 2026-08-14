@@ -368,6 +368,23 @@ main{padding:32px 0 80px}
   background:var(--surface);
 }
 
+/* 재생 모달 시작 대기 화면 */
+.play-start{
+  width:100%;
+  aspect-ratio:16/9;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--surface);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  text-align:center;
+  padding:24px;
+}
+.play-start .btn{margin-top:6px}
+
 /* ============================================
    업로드 폼
    ============================================ */

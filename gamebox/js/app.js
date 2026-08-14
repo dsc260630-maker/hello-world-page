@@ -183,13 +183,19 @@ function initPlayModal() {
         </button>
       </div>
       <div class="modal-body">
-        <iframe id="playFrame" class="play-frame" title="게임 화면"
+        <div id="playStartScreen" class="play-start">
+          <span class="tag" id="playStartTag"></span>
+          <p class="card-meta" id="playStartScore"></p>
+          <button type="button" class="btn" id="startGameBtn">시작하기</button>
+        </div>
+        <iframe id="playFrame" class="play-frame" title="게임 화면" hidden
                 sandbox="allow-scripts allow-pointer-lock allow-forms allow-popups"></iframe>
       </div>
     </div>
   `;
 
   document.getElementById('closePlayModal').addEventListener('click', closePlayModal);
+  document.getElementById('startGameBtn').addEventListener('click', startPendingGame);
 
   // 오버레이(바깥 영역) 클릭 시 닫기 — 모달 박스 클릭은 제외
   modal.addEventListener('click', (e) => {
@@ -209,15 +215,35 @@ function getGamePublicUrl(filePath) {
 
 // 현재 재생 모달이 열려있는 동안의 점수 메시지 리스너 (닫을 때 반드시 해제)
 let currentScoreHandler = null;
+// 시작 대기 화면에서 "시작하기"를 누르면 실행할 게임
+let pendingGame = null;
 
-async function openPlayModal(game) {
+function openPlayModal(game) {
+  pendingGame = game;
+
   document.getElementById('playModalTitle').textContent = game.title;
+  document.getElementById('playStartTag').textContent = game.category;
+  document.getElementById('playStartScore').textContent = myScores[game.id]
+    ? `내 최고 점수: ${myScores[game.id].toLocaleString()}`
+    : '아직 플레이 기록이 없어요';
 
+  document.getElementById('playStartScreen').hidden = false;
   const frame = document.getElementById('playFrame');
-  frame.srcdoc = '<p style="font-family:sans-serif;color:#787774;padding:20px">불러오는 중...</p>';
+  frame.hidden = true;
+  frame.srcdoc = '';
 
   document.getElementById('playModal').classList.add('is-open');
   document.body.style.overflow = 'hidden';
+}
+
+async function startPendingGame() {
+  const game = pendingGame;
+  if (!game) return;
+
+  document.getElementById('playStartScreen').hidden = true;
+  const frame = document.getElementById('playFrame');
+  frame.hidden = false;
+  frame.srcdoc = '<p style="font-family:sans-serif;color:#787774;padding:20px">불러오는 중...</p>';
 
   // 게임이 postMessage({ type: 'gamebox:score', score }) 로 점수를 보내오면 최고 점수 갱신 시도.
   // event.source로 지금 열려있는 게임 iframe이 보낸 메시지인지 확인해서 다른 메시지는 무시.
@@ -254,6 +280,7 @@ function closePlayModal() {
   document.getElementById('playModal').classList.remove('is-open');
   document.getElementById('playFrame').srcdoc = '';
   document.body.style.overflow = '';
+  pendingGame = null;
   if (currentScoreHandler) {
     window.removeEventListener('message', currentScoreHandler);
     currentScoreHandler = null;
