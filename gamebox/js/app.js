@@ -74,7 +74,7 @@ async function submitScore(gameId, score) {
   const prev = myScores[gameId] || 0;
   if (score <= prev) return;
 
-  const { error } = await sb.rpc('submit_score', { game_id: gameId, score });
+  const { error } = await sb.rpc('submit_score', { p_game_id: gameId, p_score: score });
   if (error) {
     console.error('점수 기록 실패:', error.message);
     return;
