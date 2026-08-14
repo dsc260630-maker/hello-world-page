@@ -5,7 +5,11 @@
 --  도달하지 않으므로, 로그인한 사용자가 점수를 낼 때만 실패가 발생했음)
 -- 파라미터 이름 자체를 p_ 접두사로 바꿔 컬럼명과 절대 겹치지 않게 한다.
 -- (프론트엔드 sb.rpc() 호출도 p_game_id / p_score로 함께 변경 필요 — js/app.js 참고)
-create or replace function public.submit_score(p_game_id bigint, p_score integer)
+-- PostgreSQL은 create or replace function으로 파라미터 "이름"을 바꿀 수 없으므로
+-- (42P13: cannot change name of input parameter) 먼저 기존 함수를 지운다.
+drop function if exists public.submit_score(bigint, integer);
+
+create function public.submit_score(p_game_id bigint, p_score integer)
 returns void
 language plpgsql
 security definer
@@ -26,3 +30,5 @@ begin
   where excluded.score > high_scores.score;
 end;
 $$;
+
+notify pgrst, 'reload schema';
