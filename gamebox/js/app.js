@@ -188,6 +188,9 @@ function initPlayModal() {
           <p class="card-meta" id="playStartScore"></p>
           <button type="button" class="btn" id="startGameBtn">시작하기</button>
         </div>
+        <div id="playLoading" class="play-start" hidden>
+          <p class="card-meta">불러오는 중...</p>
+        </div>
         <iframe id="playFrame" class="play-frame" title="게임 화면" hidden
                 sandbox="allow-scripts allow-pointer-lock allow-forms allow-popups"></iframe>
       </div>
@@ -217,6 +220,8 @@ function getGamePublicUrl(filePath) {
 let currentScoreHandler = null;
 // 시작 대기 화면에서 "시작하기"를 누르면 실행할 게임
 let pendingGame = null;
+// 현재 iframe에 로드된 게임의 blob URL (닫거나 새로 시작할 때 해제)
+let currentGameBlobUrl = null;
 
 function openPlayModal(game) {
   pendingGame = game;
@@ -228,9 +233,14 @@ function openPlayModal(game) {
     : '아직 플레이 기록이 없어요';
 
   document.getElementById('playStartScreen').hidden = false;
+  document.getElementById('playLoading').hidden = true;
   const frame = document.getElementById('playFrame');
   frame.hidden = true;
-  frame.srcdoc = '';
+  frame.src = 'about:blank';
+  if (currentGameBlobUrl) {
+    URL.revokeObjectURL(currentGameBlobUrl);
+    currentGameBlobUrl = null;
+  }
 
   document.getElementById('playModal').classList.add('is-open');
   document.body.style.overflow = 'hidden';
@@ -241,9 +251,8 @@ async function startPendingGame() {
   if (!game) return;
 
   document.getElementById('playStartScreen').hidden = true;
+  document.getElementById('playLoading').hidden = false;
   const frame = document.getElementById('playFrame');
-  frame.hidden = false;
-  frame.srcdoc = '<p style="font-family:sans-serif;color:#787774;padding:20px">불러오는 중...</p>';
 
   // 게임이 postMessage({ type: 'gamebox:score', score }) 로 점수를 보내오면 최고 점수 갱신 시도.
   // event.source로 지금 열려있는 게임 iframe이 보낸 메시지인지 확인해서 다른 메시지는 무시.
@@ -258,15 +267,27 @@ async function startPendingGame() {
   window.addEventListener('message', currentScoreHandler);
 
   // Supabase Storage가 공개 버킷의 HTML을 text/plain으로 강제 서빙하기 때문에
-  // <iframe src="..."> 로는 실행이 안 됨 → fetch로 원문을 받아 srcdoc에 주입해서 실행시킨다.
+  // <iframe src="게임파일URL">로는 실행이 안 됨 → fetch로 원문을 받아온 뒤 blob URL을 만들어 그걸 src로 넣는다.
+  // (참고: srcdoc으로 직접 주입하면 sandbox 처리된 opaque-origin 문서가 간헐적으로
+  //  전혀 페인트되지 않는 채로 남는 브라우저 렌더링 버그가 있어 blob URL 방식으로 교체함)
+  let blobUrl;
   try {
     const res = await fetch(getGamePublicUrl(game.file_path));
     if (!res.ok) throw new Error(`파일을 불러오지 못했습니다 (${res.status})`);
-    frame.srcdoc = await res.text();
+    const html = await res.text();
+    blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
   } catch (err) {
-    frame.srcdoc = `<p style="font-family:sans-serif;color:#E03E3E;padding:20px">게임을 불러오지 못했습니다: ${err.message}</p>`;
+    document.getElementById('playLoading').hidden = true;
+    document.getElementById('playStartScreen').hidden = false;
+    showToast(`게임을 불러오지 못했습니다: ${err.message}`);
     return;
   }
+
+  document.getElementById('playLoading').hidden = true;
+  frame.hidden = false;
+  if (currentGameBlobUrl) URL.revokeObjectURL(currentGameBlobUrl);
+  currentGameBlobUrl = blobUrl;
+  frame.src = blobUrl;
 
   // 플레이 수 증가 (낙관적 업데이트 + 서버 반영)
   game.plays += 1;
@@ -278,7 +299,11 @@ async function startPendingGame() {
 
 function closePlayModal() {
   document.getElementById('playModal').classList.remove('is-open');
-  document.getElementById('playFrame').srcdoc = '';
+  document.getElementById('playFrame').src = 'about:blank';
+  if (currentGameBlobUrl) {
+    URL.revokeObjectURL(currentGameBlobUrl);
+    currentGameBlobUrl = null;
+  }
   document.body.style.overflow = '';
   pendingGame = null;
   if (currentScoreHandler) {
