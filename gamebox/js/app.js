@@ -73,7 +73,7 @@ function getFilteredGames() {
 async function loadGames() {
   const { data, error } = await sb
     .from('games')
-    .select('*, profiles(email)')
+    .select('*, profiles(display_name)')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -110,7 +110,7 @@ function renderGrid() {
           <div class="card-body">
             <span class="tag">${g.category}</span>
             <h3 class="card-title">${g.title}</h3>
-            <p class="card-meta">by ${g.profiles?.email ?? '익명'} · 플레이 ${g.plays.toLocaleString()}회</p>
+            <p class="card-meta">by ${g.profiles?.display_name ?? '익명'} · 플레이 ${g.plays.toLocaleString()}회</p>
           </div>
         </article>
       `).join('')}
