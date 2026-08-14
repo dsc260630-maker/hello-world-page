@@ -385,6 +385,7 @@ main{padding:32px 0 80px}
   padding:24px;
 }
 .play-start .btn{margin-top:6px}
+.play-start[hidden]{display:none} /* display:flex가 hidden 속성보다 우선 적용되는 걸 막기 위함 */
 
 /* ============================================
    업로드 폼
