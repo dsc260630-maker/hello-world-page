@@ -2,6 +2,9 @@
    디자인 시스템 (변경 금지: 색/버튼/폰트/아이콘 토큰)
    ============================================ */
 
+/* 폰트: Inter (@import는 다른 규칙보다 앞에 있어야 브라우저가 인식함) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
+
 /* 색 조합: 노션 · 모노톤 */
 :root{
   --primary:#2383E2;
@@ -12,8 +15,6 @@
   --border:#E9E9E7;
 }
 
-/* 폰트: Inter */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap');
 body{font-family:'Inter',sans-serif;letter-spacing:-0.01em}
 h1,h2,h3{font-weight:800}
 
