@@ -490,5 +490,7 @@ async function init() {
   renderGrid();
   initPlayModal();
   initUploadModal();
+  // auth.js의 최초 로그인 상태 확인이 이 시점보다 먼저 끝났을 수 있으니 한 번 더 동기화
+  loadMyScores();
 }
 init();

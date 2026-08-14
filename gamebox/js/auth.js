@@ -140,7 +140,8 @@ sb.auth.onAuthStateChange(async (_event, session) => {
   }
 
   renderAuthArea();
-  loadMyScores();
+  // 페이지 최초 로드 시 이 콜백이 app.js보다 먼저 실행될 수 있어서 존재 여부를 확인하고 호출
+  if (typeof loadMyScores === 'function') loadMyScores();
 });
 
 initAuthModal();
